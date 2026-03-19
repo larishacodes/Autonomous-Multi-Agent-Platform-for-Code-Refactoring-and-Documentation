@@ -1,0 +1,31 @@
+{
+  "parse_success": true,
+  "parser_used": "javalang",
+  "language": "java",
+  "total_loc": 47,
+  "classes": [
+    {
+      "name": "OrderService",
+      "lineno": 1,
+      "loc": 47,
+      "method_count": 1
+    }
+  ],
+  "functions": [
+    {
+      "name": "calculateTotal",
+      "lineno": 3,
+      "loc": 44,
+      "param_count": 6,
+      "return_type": "double",
+      "modifiers": [
+        "public"
+      ],
+      "nesting_depth": 2,
+      "conditional_count": 12,
+      "loop_count": 0,
+      "responsibility_count": 1,
+      "parser_used": "javalang"
+    }
+  ]
+}

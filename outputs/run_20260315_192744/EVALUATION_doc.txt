@@ -1,0 +1,64 @@
+============================================================
+JAVA DOCUMENTATION QUALITY EVALUATION REPORT
+============================================================
+Generated: 2026-03-15 19:28:32
+
+METHOD COVERAGE
+----------------------------------------
+Score  : 1.0/1.0
+Covered: 1/1 methods
+
+COMPLETENESS
+----------------------------------------
+Score : 1.0/1.0  (5/5 checks passed)
+  ✅ Has Overview
+  ✅ Has Parameters
+  ✅ Has Return Info
+  ✅ Has Method Docs
+  ✅ Has Javadoc Style
+
+LENGTH & READABILITY
+----------------------------------------
+Score      : 1.0/1.0
+Word count : 127  (expected 20–200)
+Line count : 38
+
+OVERALL CONFIDENCE
+----------------------------------------
+Score  : 1.0/1.0
+Status : ✅ EXCELLENT
+
+Component Scores:
+  Coverage        ████████████████████  1.000  (35%)
+  Completeness    ████████████████████  1.000  (35%)
+  Length          ████████████████████  1.000  (30%)
+
+============================================================
+VERDICT
+============================================================
+✅ Documentation ACCEPTED — Good to excellent quality.
+
+============================================================
+DOCUMENTATION PREVIEW (first 20 lines)
+============================================================
+   1: # Java Code Documentation
+   2: 
+   3: ## Overview
+   4: 
+   5: This module contains 1 method(s) and 1 class(es).
+   6: 
+   7: > *Note: Generated using template fallback (Doc Agent model not yet trained). Run training/train_doc_agent_java.py on Kaggle for AI-generated descriptions.*
+   8: 
+   9: ---
+  10: 
+  11: ## Classes
+  12: 
+  13: ### `PaymentProcessor`
+  14: 
+  15: **Description:** Class `PaymentProcessor` — auto-extracted from Java source.
+  16: 
+  17: | Metric | Value |
+  18: |--------|-------|
+  19: | Line number | 1 |
+  20: | Lines of code | 40 |
+  ... (38 lines total)
