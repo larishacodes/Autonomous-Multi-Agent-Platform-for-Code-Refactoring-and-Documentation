@@ -7,31 +7,58 @@ _os.environ.setdefault('HF_HUB_OFFLINE', '1')
 """
 main.py — Entry point for the Autonomous Multi-Agent Platform.
 
-Supports:
-- Full pipeline (refactor + document)
-- Logging control
-- Optional RAG querying (ask / interactive)
+Usage:
+    python main.py --file SimpleTest.java --mode both
+    python main.py --file OrderProcessor.java --mode refactor
+    python main.py --file SimpleTest.java --mode document
 """
 
-# ── Silence noisy libs BEFORE imports ───────────────────────────────────────
+# ── Must be the very first lines — before ANY import ─────────────────────────
+import os
 import warnings
+
+# Fix 1: Prevents safetensors background thread from calling HuggingFace API
+# This kills the 50-line ConnectError / OSError traceback entirely
+os.environ["TRANSFORMERS_OFFLINE"]        = "1"
+
+# Fix 2: Suppresses tqdm progress bars from safetensors / HF Hub loading
+os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+
+# Fix 3: Suppress tokenizer parallelism warning
+os.environ["TOKENIZERS_PARALLELISM"]      = "false"
+
+# Fix 4: Suppress all Python warnings
 warnings.filterwarnings("ignore")
 
+# Fix 5: Silence all third-party loggers — must be before any transformers import
 import logging
-for _lib in [
-    "httpx", "httpcore", "urllib3", "huggingface_hub",
-    "transformers", "peft", "torch", "safetensors",
-    "huggingface_hub.utils._http"
-]:
-    logging.getLogger(_lib).setLevel(logging.ERROR)
 
-# ── Logging config ──────────────────────────────────────────────────────────
-logging.basicConfig(
-    level=logging.WARNING,
-    format="  ⚠  %(message)s",
-)
+_SILENT = [
+    "transformers",
+    "transformers.modeling_utils",
+    "transformers.configuration_utils",
+    "transformers.tokenization_utils_base",
+    "transformers.safetensors_conversion",
+    "peft",
+    "torch",
+    "safetensors",
+    "accelerate",
+    "datasets",
+    "huggingface_hub",
+    "huggingface_hub.utils._http",
+    "huggingface_hub.utils._headers",
+    "httpx",
+    "httpcore",
+    "urllib3",
+    "filelock",
+]
+for _lib in _SILENT:
+    logging.getLogger(_lib).setLevel(logging.CRITICAL)
 
-# ───────────────────────────────────────────────────────────────────────────
+# Pipeline logger — WARNING only (our own messages)
+logging.basicConfig(level=logging.WARNING, format="  ⚠  %(message)s")
+
+# ─────────────────────────────────────────────────────────────────────────────
 
 import sys
 import argparse

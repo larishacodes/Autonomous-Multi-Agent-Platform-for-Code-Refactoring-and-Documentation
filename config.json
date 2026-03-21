@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "language": "java",
   "dacos": {
-    "path": ""
+    "path": "C:\\Users\\Administrator\\Documents\\GitHub\\Major_Project\\datasets\\dacos"
   },
   "models": {
     "base_model": "Salesforce/codet5p-770m",
@@ -24,7 +24,10 @@
     "long_param_critical": 12,
     "complex_conditional": 5,
     "complex_conditional_severe": 10,
-    "complex_conditional_critical": 15
+    "complex_conditional_critical": 15,
+    "multifaceted_abstraction": 2,
+    "multifaceted_abstraction_severe": 3,
+    "multifaceted_abstraction_critical": 5
   },
   "pipeline": {
     "mode": "both",

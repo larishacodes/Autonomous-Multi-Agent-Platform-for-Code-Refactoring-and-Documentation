@@ -1,13 +1,19 @@
 # evaluator/doc_evaluator.py
 #
-# Block 6b: Documentation Evaluator
-# Evaluates the quality of generated Javadoc documentation using:
-#   - Coverage    : % of methods that have documentation
-#   - Completeness: Are parameters, return values, and overview present?
-#   - Length      : Is the documentation an appropriate length?
-#   - BLEU-4      : n-gram overlap with reference (if available)
-#   - ROUGE-L     : Longest common subsequence with reference (if available)
-#   - Confidence  : Combined weighted score
+# Block 6b: Documentation Evaluator — Full Javadoc Standard
+#
+# Updated completeness checks (was 5, now 8):
+#   OLD: has_overview, has_parameters, has_return_info, has_method_docs, has_javadoc_style
+#   NEW: + has_param_tags, has_return_tag, has_description, no_html_noise
+#
+# The new checks distinguish between:
+#   - has_parameters: any mention of parameters (word "parameter" in text)
+#   - has_param_tags: actual @param Javadoc tags present
+#   - has_return_info: return mentioned anywhere
+#   - has_return_tag:  actual @return tag present
+#
+# This distinction matters because CodeT5+ passes has_parameters (template table)
+# but fails has_param_tags (@param tags absent) — the score now reflects this correctly.
 
 import re
 import logging
@@ -16,7 +22,6 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-# Try to import BLEU/ROUGE — provide fallbacks if not installed
 try:
     from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
     BLEU_AVAILABLE = True
@@ -31,73 +36,95 @@ except ImportError:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Coverage
+# Coverage — % of methods documented
 # ═══════════════════════════════════════════════════════════════════════════════
 def compute_coverage(documentation: str, parsed_code: dict) -> Dict[str, Any]:
-    """
-    Compute what percentage of Java methods are documented.
-    Checks if each method name appears in the documentation.
-    """
     functions = parsed_code.get("functions", [])
     if not functions:
-        return {"score": 1.0, "covered": 0, "total": 0, "missing": []}
+        return {"score": 1.0, "covered": 0, "total": 0,
+                "covered_functions": [], "missing_functions": []}
 
-    covered = []
-    missing = []
     doc_lower = documentation.lower()
-
+    covered, missing = [], []
     for func in functions:
         name = func.get("name", "")
-        if name.lower() in doc_lower:
-            covered.append(name)
-        else:
-            missing.append(name)
+        (covered if name.lower() in doc_lower else missing).append(name)
 
-    score = len(covered) / len(functions) if functions else 0.0
-
+    score = len(covered) / len(functions)
     return {
-        "score":              round(score, 3),
-        "covered":            len(covered),
-        "total":              len(functions),
-        "covered_functions":  covered,
-        "missing_functions":  missing,
+        "score":             round(score, 3),
+        "covered":           len(covered),
+        "total":             len(functions),
+        "covered_functions": covered,
+        "missing_functions": missing,
     }
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Completeness
+# Completeness — 8 checks covering full Javadoc standard
 # ═══════════════════════════════════════════════════════════════════════════════
 def compute_completeness(documentation: str, parsed_code: dict) -> Dict[str, Any]:
     """
-    Check if documentation includes key Java doc sections:
-    - Overview/description
-    - Parameters mentioned (@param or parameter table)
-    - Return values mentioned (@return or return table)
-    - Method-level sections (### headers)
-    - Javadoc indicators
+    8 checks for Javadoc completeness.
+
+    Checks split into basic (always needed) and Javadoc-specific:
+      Basic:
+        has_overview       — has an overview/description section
+        has_method_docs    — has per-method documentation (### headers)
+        has_description    — has a meaningful description (>= 5 words in first sentence)
+        no_html_noise      — no raw HTML tags (<p>, </p> etc.) in output
+
+      Javadoc-specific:
+        has_parameters     — parameters mentioned anywhere (word "param" or table)
+        has_param_tags     — actual @param tags present (strict Javadoc format)
+        has_return_info    — return value mentioned anywhere
+        has_return_tag     — actual @return tag present (strict Javadoc format)
     """
     doc_lower = documentation.lower()
 
+    # Basic checks
+    has_overview    = any(kw in doc_lower for kw in
+                          ["overview", "description", "this module", "this class", "##"])
+    has_method_docs = "###" in documentation
+
+    # Description quality — first non-heading non-table line with >= 5 words
+    desc_lines = [l.strip() for l in documentation.splitlines()
+                  if l.strip() and not l.startswith("#")
+                  and not l.startswith("|") and not l.startswith(">")
+                  and not l.startswith("**Signature") and not l.startswith("---")]
+    has_description = any(len(l.split()) >= 5 for l in desc_lines[:10])
+
+    # HTML noise check — raw <p> tags indicate model output formatting issue
+    no_html_noise = not bool(re.search(r"<[a-zA-Z][^>]*>", documentation))
+
+    # Parameter checks — two levels
+    has_parameters = any(kw in doc_lower for kw in
+                         ["@param", "param", "parameter", "parameters", "arguments",
+                          "parameters |"])
+    has_param_tags = "@param" in documentation   # strict: actual tag
+
+    # Return checks — two levels
+    has_return_info = any(kw in doc_lower for kw in
+                          ["@return", "return", "returns", "output", "result"])
+    has_return_tag  = "@return" in documentation  # strict: actual tag
+
     checks = {
-        "has_overview":       any(kw in doc_lower for kw in
-                                  ["overview", "description", "this module", "this class", "##"]),
-        "has_parameters":     any(kw in doc_lower for kw in
-                                  ["@param", "param", "parameter", "parameters", "arguments"]),
-        "has_return_info":    any(kw in doc_lower for kw in
-                                  ["@return", "return", "returns", "output", "result"]),
-        "has_method_docs":    "###" in documentation,
-        "has_javadoc_style":  any(kw in doc_lower for kw in
-                                  ["@param", "@return", "@throws", "/**", "javadoc",
-                                   "lines of code", "parameters |"]),
+        "has_overview":    has_overview,
+        "has_method_docs": has_method_docs,
+        "has_description": has_description,
+        "no_html_noise":   no_html_noise,
+        "has_parameters":  has_parameters,
+        "has_param_tags":  has_param_tags,
+        "has_return_info": has_return_info,
+        "has_return_tag":  has_return_tag,
     }
 
     score = sum(checks.values()) / len(checks)
-
     return {
-        "score":   round(score, 3),
-        "checks":  checks,
-        "passed":  sum(checks.values()),
-        "total":   len(checks),
+        "score":  round(score, 3),
+        "checks": checks,
+        "passed": sum(checks.values()),
+        "total":  len(checks),
     }
 
 
@@ -105,23 +132,17 @@ def compute_completeness(documentation: str, parsed_code: dict) -> Dict[str, Any
 # BLEU-4
 # ═══════════════════════════════════════════════════════════════════════════════
 def compute_bleu(reference: str, hypothesis: str) -> float:
-    """
-    Compute BLEU-4 score between reference and generated documentation.
-    Falls back to word overlap if NLTK not available.
-    """
     if not reference:
         return 0.0
-
     if BLEU_AVAILABLE:
         try:
             ref_tokens = reference.lower().split()
             hyp_tokens = hypothesis.lower().split()
             smoothing  = SmoothingFunction().method1
-            return round(sentence_bleu([ref_tokens], hyp_tokens, smoothing_function=smoothing), 3)
-        except Exception as e:
-            logger.debug(f"BLEU calculation failed: {e}")
-
-    # Fallback: simple word overlap
+            return round(sentence_bleu([ref_tokens], hyp_tokens,
+                                       smoothing_function=smoothing), 3)
+        except Exception:
+            pass
     ref_words = set(reference.lower().split())
     hyp_words = set(hypothesis.lower().split())
     if not ref_words:
@@ -133,24 +154,16 @@ def compute_bleu(reference: str, hypothesis: str) -> float:
 # ROUGE-L
 # ═══════════════════════════════════════════════════════════════════════════════
 def compute_rouge_l(reference: str, hypothesis: str) -> float:
-    """
-    Compute ROUGE-L score between reference and generated documentation.
-    Falls back to LCS-based estimate if rouge_score not available.
-    """
     if not reference:
         return 0.0
-
     if ROUGE_AVAILABLE:
         try:
             scorer = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=True)
             result = scorer.score(reference, hypothesis)
             return round(result["rougeL"].fmeasure, 3)
-        except Exception as e:
-            logger.debug(f"ROUGE-L calculation failed: {e}")
-
-    # Fallback: character-level estimate
-    a = reference.lower()
-    b = hypothesis.lower()
+        except Exception:
+            pass
+    a, b = reference.lower(), hypothesis.lower()
     if not a or not b:
         return 0.0
     common = sum(1 for c in b if c in a)
@@ -158,17 +171,12 @@ def compute_rouge_l(reference: str, hypothesis: str) -> float:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Length and readability
+# Length score
 # ═══════════════════════════════════════════════════════════════════════════════
 def compute_length_score(documentation: str, parsed_code: dict) -> Dict[str, Any]:
-    """
-    Check if documentation length is appropriate for the number of methods.
-    Target: 20–100 words per method.
-    """
-    word_count = len(documentation.split())
-    line_count = len(documentation.splitlines())
-    func_count = len(parsed_code.get("functions", []))
-
+    word_count  = len(documentation.split())
+    line_count  = len(documentation.splitlines())
+    func_count  = len(parsed_code.get("functions", []))
     expected_min = max(20, func_count * 20)
     expected_max = max(200, func_count * 100)
 
@@ -194,9 +202,6 @@ def compute_length_score(documentation: str, parsed_code: dict) -> Dict[str, Any
 def compute_doc_confidence(coverage: Dict, completeness: Dict,
                            length: Dict, bleu: float, rouge_l: float,
                            has_reference: bool) -> Dict[str, Any]:
-    """
-    Combine all doc metrics into a single confidence score.
-    """
     components = {
         "coverage":     coverage["score"],
         "completeness": completeness["score"],
@@ -245,12 +250,16 @@ def evaluate_documentation(documentation: str, parsed_code: dict,
 
     Args:
         documentation: The generated documentation string
-        parsed_code:   The parsed AST structure of the Java code
+        parsed_code:   The parsed AST structure (dict) or source code string
         reference_doc: Optional reference documentation for BLEU/ROUGE
 
     Returns:
         Full evaluation results dict
     """
+    # Handle both dict and string input for parsed_code (pipeline compat)
+    if isinstance(parsed_code, str):
+        parsed_code = {"functions": [], "classes": []}
+
     has_reference = reference_doc is not None and len(reference_doc.strip()) > 0
 
     coverage     = compute_coverage(documentation, parsed_code)
@@ -315,8 +324,8 @@ def save_doc_evaluation_report(analysis: Dict[str, Any], documentation: str,
               f"Score  : {conf['score']}/1.0",
               f"Status : {conf['status']}", "", "Component Scores:"]
     for name, score in conf["components"].items():
-        weight  = conf["weights"][name] * 100
-        bar     = "█" * int(score * 20) + "░" * (20 - int(score * 20))
+        weight = conf["weights"][name] * 100
+        bar    = "█" * int(score * 20) + "░" * (20 - int(score * 20))
         lines.append(f"  {name.replace('_',' ').title():<15} {bar}  {score:.3f}  ({weight:.0f}%)")
     lines.append("")
 
@@ -339,6 +348,5 @@ def save_doc_evaluation_report(analysis: Dict[str, Any], documentation: str,
     try:
         with open(output_file, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
-        logger.info(f"Doc evaluation report saved: {output_file}")
     except Exception as e:
         logger.error(f"Could not save doc report: {e}")

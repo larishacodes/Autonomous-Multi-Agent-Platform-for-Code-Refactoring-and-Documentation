@@ -8,8 +8,6 @@ from typing import Dict, List, Optional, Tuple, Any
 import statistics
 import logging
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DACOSDataset:
@@ -29,10 +27,10 @@ class DACOSDataset:
             "complexity_scores": []
         }
         
-        print(f"\n📊 Loading DACOS dataset from: {dacos_folder}")
+        logger.debug(f"\n📊 Loading DACOS dataset from: {dacos_folder}")
         
         if not self.dacos_folder.exists():
-            print(f"   ⚠ DACOS folder not found: {dacos_folder}")
+            logger.debug(f"   ⚠ DACOS folder not found: {dacos_folder}")
             self.thresholds = self._get_default_thresholds()
             return
         
@@ -40,11 +38,11 @@ class DACOSDataset:
         self._load_dacos_data()
         self.thresholds = self._calculate_thresholds()
         
-        print(f"   ✅ Loaded {len(self.stats['method_lengths'])} method samples")
+        logger.debug(f"   ✅ Loaded {len(self.stats['method_lengths'])} method samples")
         if "Long Method" in self.thresholds:
-            print(f"   ✅ Long Method threshold: {self.thresholds['Long Method']['threshold']} lines")
+            logger.debug(f"   ✅ Long Method threshold: {self.thresholds['Long Method']['threshold']} lines")
         if "Long Parameter List" in self.thresholds:
-            print(f"   ✅ Long Parameter threshold: {self.thresholds['Long Parameter List']['threshold']} params")
+            logger.debug(f"   ✅ Long Parameter threshold: {self.thresholds['Long Parameter List']['threshold']} params")
     
     def _get_default_thresholds(self):
         """Return default thresholds if DACOS loading fails."""
@@ -73,7 +71,7 @@ class DACOSDataset:
         
         # If all else fails, try Java files
         if len(self.stats["method_lengths"]) < 10:
-            print("   ℹ Structured data limited, trying Java files...")
+            logger.debug("   ℹ Structured data limited, trying Java files...")
             self._load_from_java_files()
     
     def _load_from_json(self) -> bool:
@@ -96,7 +94,7 @@ class DACOSDataset:
                     else:
                         self._extract_from_dict(data)
                 
-                print(f"   ✅ Loaded from JSON: {json_file.name}")
+                logger.debug(f"   ✅ Loaded from JSON: {json_file.name}")
                 return True
                 
             except Exception as e:
@@ -116,7 +114,7 @@ class DACOSDataset:
                     for row in reader:
                         self._extract_from_dict(row)
                 
-                print(f"   ✅ Loaded from CSV: {csv_file.name}")
+                logger.debug(f"   ✅ Loaded from CSV: {csv_file.name}")
                 return True
                 
             except Exception as e:
@@ -169,7 +167,7 @@ class DACOSDataset:
             if not sql_file.exists():
                 continue
             
-            print(f"   📄 Reading SQL file: {sql_file.name}")
+            logger.debug(f"   📄 Reading SQL file: {sql_file.name}")
             
             try:
                 # Create in-memory database
@@ -195,7 +193,7 @@ class DACOSDataset:
                     except sqlite3.Error:
                         continue
                 
-                print(f"   ✅ Executed {successful} SQL statements")
+                logger.debug(f"   ✅ Executed {successful} SQL statements")
                 
                 # Extract metrics from tables
                 self._extract_metrics_from_db(cursor)
@@ -207,7 +205,7 @@ class DACOSDataset:
                     return True
                 
             except Exception as e:
-                print(f"   ⚠ Error processing {sql_file.name}: {e}")
+                logger.debug(f"   ⚠ Error processing {sql_file.name}: {e}")
                 continue
         
         return False
@@ -303,7 +301,7 @@ class DACOSDataset:
         for method_folder in method_folders:
             if method_folder.exists():
                 java_files = list(method_folder.glob("*.java"))
-                print(f"   📄 Found {len(java_files)} Java files in {method_folder.name}")
+                logger.debug(f"   📄 Found {len(java_files)} Java files in {method_folder.name}")
                 
                 for java_file in java_files[:500]:  # Limit for performance
                     try:
@@ -443,7 +441,7 @@ def init_dacos(dacos_folder: str):
         _dacos_instance = DACOSDataset(dacos_folder)
         return _dacos_instance
     except Exception as e:
-        print(f"⚠ Failed to initialize DACOS: {e}")
+        logger.debug(f"⚠ Failed to initialize DACOS: {e}")
         return None
 
 def get_dacos():

@@ -5,16 +5,16 @@
     "error": ""
   },
   "style_metrics": {
-    "score": 0.833,
+    "score": 1.0,
     "checks": {
       "camel_case_methods": true,
       "brace_same_line": true,
       "spaces_not_tabs": true,
       "has_semicolons": true,
-      "minimal_trailing_ws": false,
+      "minimal_trailing_ws": true,
       "no_integer_discounts": true
     },
-    "passed": 5,
+    "passed": 6,
     "total": 6
   },
   "logic_correctness": {
@@ -40,7 +40,7 @@
     "applied": true
   },
   "confidence": {
-    "score": 0.498,
+    "score": 0.531,
     "status": "FAIR"
   }
 }
