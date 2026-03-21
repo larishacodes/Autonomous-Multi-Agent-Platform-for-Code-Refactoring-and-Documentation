@@ -1,0 +1,32 @@
+Refactor this Java method (5 responsibilities, threshold 2) applying Single Responsibility Principle.
+
+public class OrderService {
+
+    private String dbUrl;
+    private int maxRetries;
+    private List<String> pendingOrders;
+
+    /** Process an order end-to-end. */
+    public String processOrder(String orderId, String customerId, double amount) {
+        if (orderId == null || orderId.isEmpty()) {
+            throw new IllegalArgumentException("orderId must not be empty");
+        }
+        if (customerId == null) {
+            return "INVALID_CUSTOMER";
+        }
+        if (amount <= 0) {
+            return "INVALID_AMOUNT";
+        }
+        String status = "PENDING";
+        for (int i = 0; i < maxRetries; i++) {
+            try {
+                status = validateCustomer(customerId);
+                if (!status.equals("OK")) {
+                    break;
+                }
+                status = chargeCustomer(customerId, amount);
+
+Strategy: Extract each responsibility into a focused private method.
+Return ONLY the refactored Java code:
+
+// Additional smells also present: Complex Conditional

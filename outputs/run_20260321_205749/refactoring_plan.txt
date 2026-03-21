@@ -1,0 +1,14 @@
+JAVA REFACTORING PLAN
+==================================================
+Methods analysed : 4
+Smells detected  : 2
+
+1. [CRITICAL] Multifaceted Abstraction
+   Method    : processOrder
+   Measured  : responsibility_count = 5 (threshold: 2)
+   Action    : Apply Single Responsibility Principle — extract each responsibility into its own method.
+
+2. [MEDIUM] Complex Conditional
+   Method    : processOrder
+   Measured  : conditional_count = 5 (threshold: 5)
+   Action    : Apply Guard Clauses, Strategy pattern, or Map-based dispatch.

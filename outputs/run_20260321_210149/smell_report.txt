@@ -1,0 +1,21 @@
+============================================================
+CODE SMELL ANALYSIS REPORT — Java
+============================================================
+Methods analysed : 4
+Classes analysed : 1
+Total LOC        : 61
+Smells detected  : 2
+Parser used      : javalang
+Thresholds from  : defaults
+
+🔴 [CRITICAL] Multifaceted Abstraction
+   Method    : processOrder
+   Reason    : Method 'processOrder' has 5 distinct responsibilities (threshold: 2)
+   Refactor  : Apply Single Responsibility Principle — extract each responsibility into its own method.
+
+🟡 [MEDIUM] Complex Conditional
+   Method    : processOrder
+   Reason    : Method 'processOrder' has 5 conditional branches (threshold: 5)
+   Refactor  : Apply Guard Clauses, Strategy pattern, or Map-based dispatch.
+
+============================================================

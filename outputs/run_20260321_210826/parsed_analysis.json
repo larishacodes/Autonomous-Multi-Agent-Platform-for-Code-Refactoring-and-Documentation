@@ -1,0 +1,290 @@
+{
+  "parse_success": true,
+  "parser_used": "javalang",
+  "language": "java",
+  "total_loc": 61,
+  "file_path": "",
+  "classes": [
+    {
+      "name": "OrderService",
+      "docstring": "Sample Java class for pipeline smoke tests. Contains intentional code smells: long method, high complexity.",
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "method_count": 4,
+      "loc": 57,
+      "lcom": 0.0,
+      "instability": 0.0,
+      "methods": [
+        {
+          "name": "processOrder",
+          "params": [
+            "orderId",
+            "customerId",
+            "amount"
+          ],
+          "docstring": "Process an order end-to-end. */",
+          "file_path": "",
+          "start_line": 12,
+          "end_line": 40,
+          "calls": [
+            "processOrder",
+            "isEmpty",
+            "validateCustomer",
+            "equals",
+            "chargeCustomer",
+            "fulfillOrder",
+            "add",
+            "println"
+          ],
+          "called_by": [
+            "processOrder"
+          ],
+          "complexity": 7,
+          "loc": 29,
+          "cohesion_score": 0.0,
+          "param_count": 3,
+          "return_type": "String",
+          "modifiers": [
+            "public"
+          ],
+          "nesting_depth": 4,
+          "conditional_count": 5,
+          "loop_count": 1,
+          "responsibility_count": 5,
+          "parser_used": "javalang"
+        },
+        {
+          "name": "validateCustomer",
+          "params": [
+            "customerId"
+          ],
+          "docstring": "Validate that a customer exists and is active. */",
+          "file_path": "",
+          "start_line": 43,
+          "end_line": 48,
+          "calls": [
+            "validateCustomer",
+            "startsWith"
+          ],
+          "called_by": [
+            "processOrder",
+            "validateCustomer"
+          ],
+          "complexity": 2,
+          "loc": 6,
+          "cohesion_score": 0.0,
+          "param_count": 1,
+          "return_type": "String",
+          "modifiers": [
+            "public"
+          ],
+          "nesting_depth": 2,
+          "conditional_count": 1,
+          "loop_count": 0,
+          "responsibility_count": 1,
+          "parser_used": "javalang"
+        },
+        {
+          "name": "chargeCustomer",
+          "params": [
+            "customerId",
+            "amount"
+          ],
+          "docstring": "Charge the customer's payment method. */",
+          "file_path": "",
+          "start_line": 51,
+          "end_line": 54,
+          "calls": [
+            "chargeCustomer",
+            "println"
+          ],
+          "called_by": [
+            "processOrder",
+            "chargeCustomer"
+          ],
+          "complexity": 1,
+          "loc": 4,
+          "cohesion_score": 0.0,
+          "param_count": 2,
+          "return_type": "String",
+          "modifiers": [
+            "public"
+          ],
+          "nesting_depth": 1,
+          "conditional_count": 0,
+          "loop_count": 0,
+          "responsibility_count": 1,
+          "parser_used": "javalang"
+        },
+        {
+          "name": "fulfillOrder",
+          "params": [
+            "orderId"
+          ],
+          "docstring": "Fulfill the order from inventory. */",
+          "file_path": "",
+          "start_line": 57,
+          "end_line": 60,
+          "calls": [
+            "fulfillOrder",
+            "println"
+          ],
+          "called_by": [
+            "processOrder",
+            "fulfillOrder"
+          ],
+          "complexity": 1,
+          "loc": 4,
+          "cohesion_score": 0.0,
+          "param_count": 1,
+          "return_type": "String",
+          "modifiers": [
+            "public"
+          ],
+          "nesting_depth": 1,
+          "conditional_count": 0,
+          "loop_count": 0,
+          "responsibility_count": 1,
+          "parser_used": "javalang"
+        }
+      ],
+      "parser_used": "javalang"
+    }
+  ],
+  "functions": [
+    {
+      "name": "processOrder",
+      "params": [
+        "orderId",
+        "customerId",
+        "amount"
+      ],
+      "docstring": "Process an order end-to-end. */",
+      "file_path": "",
+      "start_line": 12,
+      "end_line": 40,
+      "calls": [
+        "processOrder",
+        "isEmpty",
+        "validateCustomer",
+        "equals",
+        "chargeCustomer",
+        "fulfillOrder",
+        "add",
+        "println"
+      ],
+      "called_by": [
+        "processOrder"
+      ],
+      "complexity": 7,
+      "loc": 29,
+      "cohesion_score": 0.0,
+      "param_count": 3,
+      "return_type": "String",
+      "modifiers": [
+        "public"
+      ],
+      "nesting_depth": 4,
+      "conditional_count": 5,
+      "loop_count": 1,
+      "responsibility_count": 5,
+      "parser_used": "javalang"
+    },
+    {
+      "name": "validateCustomer",
+      "params": [
+        "customerId"
+      ],
+      "docstring": "Validate that a customer exists and is active. */",
+      "file_path": "",
+      "start_line": 43,
+      "end_line": 48,
+      "calls": [
+        "validateCustomer",
+        "startsWith"
+      ],
+      "called_by": [
+        "processOrder",
+        "validateCustomer"
+      ],
+      "complexity": 2,
+      "loc": 6,
+      "cohesion_score": 0.0,
+      "param_count": 1,
+      "return_type": "String",
+      "modifiers": [
+        "public"
+      ],
+      "nesting_depth": 2,
+      "conditional_count": 1,
+      "loop_count": 0,
+      "responsibility_count": 1,
+      "parser_used": "javalang"
+    },
+    {
+      "name": "chargeCustomer",
+      "params": [
+        "customerId",
+        "amount"
+      ],
+      "docstring": "Charge the customer's payment method. */",
+      "file_path": "",
+      "start_line": 51,
+      "end_line": 54,
+      "calls": [
+        "chargeCustomer",
+        "println"
+      ],
+      "called_by": [
+        "processOrder",
+        "chargeCustomer"
+      ],
+      "complexity": 1,
+      "loc": 4,
+      "cohesion_score": 0.0,
+      "param_count": 2,
+      "return_type": "String",
+      "modifiers": [
+        "public"
+      ],
+      "nesting_depth": 1,
+      "conditional_count": 0,
+      "loop_count": 0,
+      "responsibility_count": 1,
+      "parser_used": "javalang"
+    },
+    {
+      "name": "fulfillOrder",
+      "params": [
+        "orderId"
+      ],
+      "docstring": "Fulfill the order from inventory. */",
+      "file_path": "",
+      "start_line": 57,
+      "end_line": 60,
+      "calls": [
+        "fulfillOrder",
+        "println"
+      ],
+      "called_by": [
+        "processOrder",
+        "fulfillOrder"
+      ],
+      "complexity": 1,
+      "loc": 4,
+      "cohesion_score": 0.0,
+      "param_count": 1,
+      "return_type": "String",
+      "modifiers": [
+        "public"
+      ],
+      "nesting_depth": 1,
+      "conditional_count": 0,
+      "loop_count": 0,
+      "responsibility_count": 1,
+      "parser_used": "javalang"
+    }
+  ]
+}

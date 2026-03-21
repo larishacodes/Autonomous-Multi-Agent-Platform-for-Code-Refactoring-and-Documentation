@@ -12,7 +12,8 @@
     "max_input_length": 512,
     "max_output_length": 256,
     "num_beams": 2,
-    "device": "auto"
+    "device": "auto",
+    "use_safetensors": false
   },
   "thresholds": {
     "long_method_lines": 30,

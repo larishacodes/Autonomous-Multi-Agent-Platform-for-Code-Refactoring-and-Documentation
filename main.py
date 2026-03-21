@@ -1,3 +1,8 @@
+import os as _os
+# Prevent transformers from contacting HuggingFace Hub during model load
+_os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
+_os.environ.setdefault('HF_HUB_OFFLINE', '1')
+
 #!/usr/bin/env python3
 """
 main.py — Entry point for the Autonomous Multi-Agent Platform.
@@ -63,49 +68,134 @@ ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
 
+# ───────────────────────────────────────────────────────────────────────────
+# Args
+# ───────────────────────────────────────────────────────────────────────────
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Autonomous Multi-Agent Platform — Java"
     )
+
     parser.add_argument("--file", "-f", default="SimpleTest.java",
-                        help="Java file to process (default: SimpleTest.java)")
+                        help="Java file to process")
+
     parser.add_argument("--mode", "-m",
                         choices=["refactor", "document", "both"],
                         default="both",
-                        help="Pipeline mode (default: both)")
+                        help="Pipeline mode")
+
+    # RAG options
+    parser.add_argument("--ask", type=str, default=None,
+                        help="Ask a single question after pipeline")
+
+    parser.add_argument("--query", action="store_true",
+                        help="Enter interactive query mode")
+
+    parser.add_argument("--query-mode",
+                        choices=["answer", "explain", "smell"],
+                        default="answer")
+
     return parser.parse_args()
 
+
+# ───────────────────────────────────────────────────────────────────────────
+# Helpers
+# ───────────────────────────────────────────────────────────────────────────
+
+def load_source(path: Path) -> str:
+    if not path.exists():
+        print(f"\n❌ File not found: {path}")
+        sys.exit(1)
+
+    code = path.read_text(encoding="utf-8")
+    if not code.strip():
+        print(f"\n❌ File is empty: {path}")
+        sys.exit(1)
+
+    return code
+
+
+def run_query(question, pipeline, query_mode):
+    try:
+        from core.ragquery import query_repo
+    except ImportError:
+        print("⚠ RAG not available")
+        return
+
+    repo_state = getattr(pipeline, "_last_repo_state", None)
+    symbol_index = getattr(pipeline, "symbol_index", None)
+
+    if not repo_state or not symbol_index:
+        print("⚠ No repo state available for querying")
+        return
+
+    print(f"\nQ: {question}\n")
+
+    response = query_repo(
+        query=question,
+        retriever=getattr(pipeline, "retriever", None),
+        symbol_index=symbol_index,
+        llm=getattr(pipeline, "doc_agent", None),
+        mode=query_mode,
+    )
+
+    print(f"A: {response.answer}")
+    print(f"\nSources: {response.sources}")
+
+
+def interactive_loop(pipeline, query_mode):
+    print("\nEnter questions (type 'exit' to quit)\n")
+
+    while True:
+        q = input("> ").strip()
+        if not q or q.lower() in ["exit", "quit"]:
+            break
+        run_query(q, pipeline, query_mode)
+
+
+# ───────────────────────────────────────────────────────────────────────────
+# Main
+# ───────────────────────────────────────────────────────────────────────────
 
 def main():
     args = parse_args()
 
-    print()
-    print("=" * 60)
+    print("\n" + "=" * 60)
     print("  Autonomous Multi-Agent Platform")
-    print("  Java Code Refactoring + Documentation")
     print("=" * 60)
     print(f"  File : {args.file}")
     print(f"  Mode : {args.mode}")
 
-    input_path = ROOT / args.file
-    if not input_path.exists():
-        print(f"\n  ❌ File not found: {args.file}")
-        print("     Put your Java file in the project root.")
-        sys.exit(1)
+    source_path = ROOT / args.file
+    source_code = load_source(source_path)
 
-    source_code = input_path.read_text(encoding="utf-8")
-    if not source_code.strip():
-        print(f"\n  ❌ File is empty: {args.file}")
-        sys.exit(1)
+    print(f"  Lines: {len(source_code.splitlines())}\n")
 
-    print(f"  Lines: {len(source_code.splitlines())}")
+    # ── Run pipeline ──────────────────────────────────────────────────────
+    try:
+        from pipeline import Pipeline
+        pipeline = Pipeline()
+        result = pipeline.run(source_code, mode=args.mode)
+    except Exception as e:
+        print(f"\n❌ Pipeline failed: {e}")
+        return 1
 
-    from pipeline import Pipeline
-    pipeline = Pipeline()
-    result   = pipeline.run(source_code, mode=args.mode)
+    if not result.get("success"):
+        print("\n❌ Pipeline completed with errors")
+        return 1
 
-    sys.exit(0 if result.get("success") else 1)
+    print("\n✅ Pipeline completed successfully\n")
+
+    # ── RAG ───────────────────────────────────────────────────────────────
+    if args.ask:
+        run_query(args.ask, pipeline, args.query_mode)
+
+    if args.query:
+        interactive_loop(pipeline, args.query_mode)
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
