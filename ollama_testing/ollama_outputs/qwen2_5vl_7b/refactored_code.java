@@ -1,11 +1,11 @@
 public double applyDiscount(double price, String customerType, String couponCode, boolean isSeasonal, int quantity, boolean isMember) {
-    double discount = applyDiscountRules(price, customerType, couponCode, isSeasonal, quantity, isMember);
+    double discount = 0;
+
+    applyDiscountRules(discount, customerType, couponCode, isSeasonal, quantity, isMember);
     return price * (1 - Math.min(discount, 0.50));
 }
 
-private double applyDiscountRules(double price, String customerType, String couponCode, boolean isSeasonal, int quantity, boolean isMember) {
-    double discount = 0;
-
+private void applyDiscountRules(double& discount, String customerType, String couponCode, boolean isSeasonal, int quantity, boolean isMember) {
     if (customerType.equals("premium")) {
         discount += 0.20;
     } else if (customerType.equals("gold")) {
@@ -31,6 +31,4 @@ private double applyDiscountRules(double price, String customerType, String coup
     if (isMember) {
         discount += 0.05;
     }
-
-    return discount;
 }

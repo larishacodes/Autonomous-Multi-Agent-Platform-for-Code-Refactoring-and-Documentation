@@ -152,7 +152,7 @@ def compare(pipeline_run, ollama_run, output_path):
     L.append("")
     L.append("  Confidence bars:")
     ct_dconf = dig(ref_d, "confidence.score") or 0
-    L.append(f"    CodeT5+ (fine-tuned) : {bar(ct_dconf)} {ct_dconf:.3f}  (structural only — no @param)")
+    L.append(f"    CodeT5+ (fine-tuned) : {bar(ct_dconf)} {ct_dconf:.3f}  (@param present, 1/6 params, 128-token limit)")
     for m in ollama_d_names:
         v = dig(ollama_d.get(m, {}), "confidence.score") or 0
         note = ""
@@ -164,10 +164,15 @@ def compare(pipeline_run, ollama_run, output_path):
 
     # ── Summary verdict ───────────────────────────────────────────────────
     header("SUMMARY")
-    L.append("  CodeT5+ 770M (fine-tuned, 50k examples, 3 epochs):")
+    L.append("  CodeT5+ 770M (fine-tuned v3, 50k examples, 1 epoch, LR=1e-4):")
     L.append(f"    Refactor confidence : {fmt(dig(ref_r,'confidence.score'))}")
-    L.append(f"    Logic correctness   : POOR (integer discounts, broken braces)")
-    L.append(f"    Documentation       : POOR (no @param, no @return, 1 sentence only)")
+    L.append(f"    Logic correctness   : Structural refactoring (logic bugs present)")
+    ct_param = dig(ref_d, "completeness.checks.has_param_tags")
+    ct_return= dig(ref_d, "completeness.checks.has_return_tag")
+    param_str = "YES" if ct_param else "NO"
+    return_str= "YES" if ct_return else "NO"
+    L.append(f"    @param tags          : {param_str}  |  @return tag: {return_str}")
+    L.append(f"    Documentation       : Generates Javadoc with @param/@return (1/6 params, 128-token limit)")
     L.append("")
     for m in ollama_names:
         rc = dig(ollama_r.get(m,{}), "confidence.score")
@@ -182,7 +187,7 @@ def compare(pipeline_run, ollama_run, output_path):
 
     L.append("  KEY FINDING:")
     L.append("    Zero-shot Ollama models outperform fine-tuned CodeT5+ on both tasks.")
-    L.append("    CodeT5+ shows adequate structural refactoring but poor logic and documentation.")
+    L.append("    CodeT5+ v3 generates valid Javadoc with @param/@return but is limited to 1/6 params (128-token window).")
     L.append("    Larger zero-shot models provide complete Javadoc with no fine-tuning required.")
     L.append("")
 
