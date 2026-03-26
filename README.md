@@ -1,6 +1,6 @@
 # Autonomous Multi-Agent Platform for Java Code Refactoring and Documentation
 
-> Fine-tuned CodeT5+ 770M with LoRA adapters for automated Java code smell detection, refactoring, and Javadoc generation. Includes comparative evaluation against zero-shot Ollama models.
+> Fine-tuned CodeT5+ 770M with LoRA adapters for automated Java code smell detection, refactoring, and Javadoc generation. Includes comparative evaluation against zero-shot Ollama models (codellama:7b, deepseek-coder:6.7b, gemma3:12b, qwen2.5vl:7b).
 
 ---
 
@@ -26,21 +26,21 @@ This platform takes a Java source file as input and runs it through a 6-block pi
 ```
 Java File
     ↓
-[Block 1] Upload & Config
+[Block 1] Upload & Config (DACOS thresholds, model paths)
     ↓
-[Block 2] Parse — extracts LOC, params, conditionals, nesting depth
+[Block 2] Parse — extracts LOC, params, conditionals, nesting depth, responsibilities
     ↓
-[Block 3] Smell Detection + Prompt Generation — DACOS thresholds
+[Block 3] Smell Detection + Prompt Generation — DACOS thresholds, SHORT/FULL templates
     ↓
 [Block 4] Agent Orchestration
     ↓
 [Block 5a] Refactor Agent (CodeT5+ 770M + LoRA, trained on RCCT Java)
 [Block 5b] Doc Agent     (CodeT5+ 770M + LoRA, trained on CodeSearchNet Java)
     ↓
-[Block 6a] Refactor Evaluator — AST validity, CodeBLEU, semantic, style
-[Block 6b] Doc Evaluator     — coverage, completeness, @param/@return checks
+[Block 6a] Refactor Evaluator — AST validity, CodeBLEU, semantic, style, improvement
+[Block 6b] Doc Evaluator     — coverage, 8-check completeness, @param/@return
     ↓
-outputs/run_TIMESTAMP/
+outputs/run_TIMESTAMP/   (12 output files)
 ```
 
 ---
@@ -48,52 +48,57 @@ outputs/run_TIMESTAMP/
 ## Project Structure
 
 ```
-Major_Project_Java/
+Autonomous Multi-Agent Platform/
 │
-├── main.py                          ← Entry point
+├── main.py                          ← Entry point (noise-free terminal output)
 ├── pipeline.py                      ← Agent orchestration (Block 4)
-├── config.json                      ← Settings (max_output, num_beams, thresholds)
+├── config.json                      ← Settings (thresholds, model paths, DACOS)
+├── generate_graphs.py               ← Standalone graph generator (4 comparison graphs)
 │
 ├── SimpleTest.java                  ← Demo input (3 smells, fits model window)
 ├── OrderProcessor.java              ← Complex input (4 smells, smell detection demo)
+├── OrderService.java                ← Complex input (too large for model window demo)
 │
 ├── parser/
-│   └── java_parser.py               ← Block 2: javalang parser + regex fallback
+│   └── java_parser.py               ← Block 2: javalang + regex fallback
 │
 ├── prompt_engine/
-│   ├── prompting_engine.py          ← Block 3: generates refactor + doc prompts
-│   ├── smell_detector.py            ← Detects Long Method, Long Param, Complex Conditional, Multifaceted Abstraction
-│   ├── templates.py                 ← 5-line prompt templates for 512-token window
-│   ├── dacos_knowledge.py           ← DACOS default thresholds (LM=30, LP=5, CC=5, MA=2)
+│   ├── prompting_engine.py          ← Block 3: refactor + doc prompts
+│   ├── smell_detector.py            ← Detects 4 smells with severity levels
+│   ├── templates.py                 ← SHORT (CodeT5+) + FULL (Ollama) templates
+│   ├── dacos_knowledge.py           ← DACOS thresholds (LM=30, LP=5, CC=5, MA=2)
 │   ├── dacos_integration.py         ← Loads real thresholds from DACOS SQL files
-│   └── dacos_evaluator.py           ← DACOS-based smell scoring
+│   └── dacos_evaluator.py           ← DACOS-based smell accuracy scoring
 │
 ├── agents/
 │   ├── refactor_agent.py            ← Block 5a: CodeT5+ + LoRA refactoring
 │   └── doc_agent.py                 ← Block 5b: CodeT5+ + LoRA documentation
 │
 ├── evaluator/
-│   ├── refactor_evaluator.py        ← Block 6a: AST, style, CodeBLEU, semantic, improvement
-│   └── doc_evaluator.py             ← Block 6b: coverage, completeness, length
+│   ├── refactor_evaluator.py        ← Block 6a: 6 metrics, weighted confidence
+│   └── doc_evaluator.py             ← Block 6b: 8 Javadoc checks, honest scoring
 │
 ├── models/
-│   ├── refactor_agent_final/        ← LoRA adapter (trained on RCCT Java, BLEU-4=0.6488)
-│   └── doc_agent_final/             ← LoRA adapter (trained on CodeSearchNet Java 50k)
+│   ├── refactor_agent_final/        ← LoRA adapter (trained on RCCT Java)
+│   └── doc_agent_final/             ← LoRA adapter (trained on CodeSearchNet Java)
 │
 ├── datasets/
-│   └── dacos/                       ← DACOS SQL files for threshold loading
-│
-├── training/
-│   └── train_doc_agent_java.py      ← Kaggle training script (doc agent)
+│   └── dacos/                       ← DACOS SQL files (DACOSMain.sql, DACOSExtended.sql)
 │
 ├── ollama_testing/                  ← Separate Ollama comparison module
 │   ├── run_ollama_test.py           ← Entry point
 │   ├── ollama_client.py             ← Ollama REST API wrapper
 │   ├── ollama_refactor.py           ← Refactoring via Ollama
-│   ├── ollama_doc.py                ← Documentation via Ollama
-│   ├── ollama_evaluator.py          ← Evaluation metrics (same as main pipeline)
+│   ├── ollama_doc.py                ← Documentation via Ollama (FULL Javadoc template)
+│   ├── ollama_evaluator.py          ← Same metrics as main pipeline + logic correctness
 │   ├── ollama_compare.py            ← Side-by-side comparison report
 │   └── README.md                    ← Ollama module documentation
+│
+├── graphs/                          ← Generated by generate_graphs.py
+│   ├── graph1_refactor_confidence.png
+│   ├── graph2_loc_reduction.png
+│   ├── graph3_doc_comparison.png
+│   └── graph4_radar.png
 │
 └── outputs/
     └── run_TIMESTAMP/               ← One folder per pipeline run
@@ -120,24 +125,22 @@ Major_Project_Java/
 - Python 3.10+
 - Windows 10/11 (tested) or Linux
 - 8 GB RAM minimum (16 GB recommended)
-- GPU optional — CPU inference supported (slower)
+- GPU optional — CPU inference supported
 
 ### Installation
 
 ```bash
-cd C:\Users\Administrator\Documents\Major_Project_Java
-
 # Create virtual environment
 python -m venv venv
 venv\Scripts\activate          # Windows
 # source venv/bin/activate     # Linux/Mac
 
 # Install dependencies
-pip install transformers==4.44.0 peft==0.10.0 accelerate==0.29.0
-pip install torch datasets safetensors
-pip install rouge-score sacrebleu bert-score
-pip install javalang matplotlib seaborn plotly
-pip install requests huggingface_hub
+python -m pip install transformers==4.44.0 peft==0.10.0 accelerate==0.29.0
+python -m pip install torch datasets safetensors
+python -m pip install rouge-score sacrebleu bert-score
+python -m pip install javalang matplotlib seaborn
+python -m pip install requests huggingface_hub
 ```
 
 ---
@@ -147,33 +150,45 @@ pip install requests huggingface_hub
 ### Main Pipeline
 
 ```bash
-# Activate venv first
 venv\Scripts\activate
 
-# Run on demo file (both refactoring and documentation)
+# Both refactoring and documentation
 python main.py --file SimpleTest.java --mode both
 
 # Refactoring only
 python main.py --file SimpleTest.java --mode refactor
 
 # Documentation only
-python main.py --file SimpleTest.java --mode doc
+python main.py --file SimpleTest.java --mode document
 
 # Run on your own Java file
 python main.py --file YourClass.java --mode both
 ```
 
-### Output
+### Generate Graphs
 
-Results are saved to `outputs/run_TIMESTAMP/`. Key files:
+```bash
+# Generates 4 comparison graphs into graphs/ folder
+python generate_graphs.py
+```
+
+### Output Files
+
+Results saved to `outputs/run_TIMESTAMP/`:
 
 | File | Contents |
 |------|----------|
-| `refactored_code.java` | Refactored Java output from CodeT5+ |
+| `refactored_code.java` | Refactored Java output |
 | `documentation.md` | Generated Javadoc |
 | `smell_report.txt` | Detected smells with reasons |
+| `refactoring_plan.txt` | Action plan per smell |
+| `PROMPT_refactor_agent.txt` | Exact prompt sent to Refactor Agent |
+| `PROMPT_doc_agent.txt` | Exact prompt sent to Doc Agent |
 | `EVALUATION_refactor.txt` | Human-readable refactor scores |
 | `EVALUATION_doc.txt` | Human-readable doc scores |
+| `EVALUATION_refactor.json` | Machine-readable refactor scores |
+| `EVALUATION_doc.json` | Machine-readable doc scores |
+| `parsed_analysis.json` | Parser metrics per method |
 | `summary.json` | All scores in one JSON |
 
 ---
@@ -182,61 +197,73 @@ Results are saved to `outputs/run_TIMESTAMP/`. Key files:
 
 ### Block 2 — Parser (`parser/java_parser.py`)
 
-Uses `javalang` (Java 8) with regex fallback. Extracts:
+Uses `javalang` (Java 8) as primary parser with regex fallback for Java 9+. Extracts:
 
-- Lines of code (LOC)
-- Parameter count
-- Conditional count
-- Loop count
-- Nesting depth
-- Responsibility count
+| Metric | Description |
+|--------|-------------|
+| LOC | Lines of code per method |
+| param_count | Number of parameters |
+| conditional_count | if / else / case branches |
+| loop_count | for / while / do loops |
+| nesting_depth | Maximum brace nesting depth |
+| responsibility_count | Distinct responsibility types (I/O, persistence, iteration, etc.) |
 
-Verified: 32/32 checks pass on `OrderProcessor.java`
+Verified: 32/32 checks pass on `OrderProcessor.java`.
 
 ### Block 3 — Prompting Engine (`prompt_engine/`)
 
-Detects smells using DACOS thresholds and generates prompts:
+Detects smells using DACOS thresholds and generates two prompt types:
 
-| Smell | Default Threshold |
-|-------|-----------------|
-| Long Method | 30 lines |
-| Long Parameter List | 5 params |
-| Complex Conditional | 5 conditionals |
-| Multifaceted Abstraction | 2 responsibilities |
+| Smell | Metric | Default Threshold |
+|-------|--------|-----------------|
+| Long Method | loc | 30 lines |
+| Long Parameter List | param_count | 5 params |
+| Complex Conditional | conditional_count | 5 branches |
+| Multifaceted Abstraction | responsibility_count | 2 responsibilities |
 
-Prompt fits within 512 tokens (method-level only, not full file).
+**Two prompt templates (`templates.py`):**
+- `SHORT` — for CodeT5+: fits 512-token window, sends actual Java code, no verbose instructions
+- `FULL` — for Ollama: complete Javadoc instructions with explicit `@param`, `@return`, `@throws` requirements
 
 ### Block 5a — Refactor Agent (`agents/refactor_agent.py`)
 
 - Base model: `Salesforce/codet5p-770m`
-- Fine-tuned on RCCT Java dataset
-- BLEU-4 = 0.6488 on training set
-- `max_output_length=256`, `num_beams=2` (CPU-friendly)
-- Post-processing fixes `#comments`, unclosed braces, indentation
+- Fine-tuned on RCCT Java dataset using Seq2SeqTrainer
+- LoRA: r=16, alpha=32, target_modules=["q","v"]
+- `max_output_length=256`, `num_beams=2`
+- Post-processing: fixes `#comments`, unclosed braces, indentation
 
 ### Block 5b — Doc Agent (`agents/doc_agent.py`)
 
 - Base model: `Salesforce/codet5p-770m`
-- Fine-tuned on CodeSearchNet Java (50k examples, 3 epochs)
-- LoRA: r=8, alpha=32, dropout=0.05
-- ROUGE-L = 0.2012 on test set (real generation metric)
+- Fine-tuned on CodeSearchNet Java using Seq2SeqTrainer
+- LoRA: r=8, alpha=32, target_modules=["q","v"]
+- Prompt format matches CodeSearchNet training pairs exactly
+- `max_output_length=256`, `num_beams=2`
 
 ### Block 6a — Refactor Evaluator (`evaluator/refactor_evaluator.py`)
 
 | Metric | Weight | Description |
 |--------|--------|-------------|
-| Style | 20% | 6 Java style checks |
-| CodeBLEU | 25% | Code-aware BLEU score |
-| Semantic | 35% | Method preservation rate |
+| Style | 20% | 6 Java style checks (camel case, braces, semicolons, tabs, whitespace) |
+| CodeBLEU | 25% | Code-aware n-gram + syntax similarity |
+| Semantic | 35% | Method preservation + token similarity |
 | Improvement | 20% | LOC reduction score |
 
 ### Block 6b — Doc Evaluator (`evaluator/doc_evaluator.py`)
 
-| Metric | Weight | Description |
-|--------|--------|-------------|
-| Coverage | 35% | Methods documented / total |
-| Completeness | 35% | Has overview, params, return, Javadoc style |
-| Length | 30% | Word count in expected range |
+8 completeness checks:
+
+| Check | Description |
+|-------|-------------|
+| has_overview | Has overview/description section |
+| has_method_docs | Has per-method documentation |
+| has_description | First sentence >= 5 words |
+| no_html_noise | No raw HTML tags (`<p>` etc.) |
+| has_parameters | Parameters mentioned anywhere |
+| has_param_tags | Actual `@param` tags present |
+| has_return_info | Return value mentioned anywhere |
+| has_return_tag | Actual `@return` tag present |
 
 ---
 
@@ -247,11 +274,19 @@ Prompt fits within 512 tokens (method-level only, not full file).
 | Property | Value |
 |----------|-------|
 | Base model | Salesforce/codet5p-770m |
-| Training dataset | RCCT Java |
-| Training platform | Google Colab → Kaggle |
-| BLEU-4 | 0.6488 |
-| LoRA rank | 16 |
-| LoRA alpha | 32 |
+| Training dataset | RCCT Java (12,872 train / 1,625 val / 1,586 test) |
+| Training platform | Kaggle T4 GPU |
+| Trainer | Seq2SeqTrainer (fp16) |
+| LoRA rank | 16, alpha=32, dropout=0.05 |
+| Learning rate | 2e-4 |
+| Effective batch | 32 (batch=2, grad_acc=16) |
+| Epochs | 3 (best model at epoch 2) |
+| ROUGE-1 | 0.8766 |
+| ROUGE-2 | 0.8156 |
+| ROUGE-L | 0.8614 |
+| BLEU-4 | 82.01 |
+| AST Validity | 0.990 (198/200 valid Java) |
+| Token Similarity | 0.7849 |
 | Location | `models/refactor_agent_final/` |
 
 ### Doc Agent
@@ -259,42 +294,58 @@ Prompt fits within 512 tokens (method-level only, not full file).
 | Property | Value |
 |----------|-------|
 | Base model | Salesforce/codet5p-770m |
-| Training dataset | CodeSearchNet Java (50k / 412k) |
-| Training platform | Kaggle P100 |
-| ROUGE-L | 0.2012 (test set, greedy decoding) |
-| ROUGE-1 | 0.2625 |
-| BLEU | 4.59 |
-| BERTScore | 0.7644 |
-| LoRA rank | 8 |
-| LoRA alpha | 32 |
-| Epochs | 3 (early stopping at epoch 1) |
+| Training dataset | CodeSearchNet Java (50k examples) |
+| Training platform | Kaggle T4 GPU |
+| Trainer | Seq2SeqTrainer (fp32) |
+| LoRA rank | 8, alpha=32 |
+| Learning rate | 1e-4 |
+| Effective batch | 32 (batch=4, grad_acc=8) |
+| Epochs | 1 (val loss < train loss — no overfitting) |
+| ROUGE-1 | 0.2886 |
+| ROUGE-2 | 0.0981 |
+| ROUGE-L | 0.2251 |
+| BLEU | 8.01 |
+| BERTScore F1 | 0.7820 |
+| @param coverage | 0.910 (200 test examples) |
+| @return rate | 0.910 (200 test examples) |
+| Javadoc quality | 0.965 |
 | Location | `models/doc_agent_final/` |
 
 ---
 
 ## Ollama Testing
 
-A separate module tests Ollama models on the same prompts as the main pipeline — no changes to the main project.
+A separate module tests Ollama models on the same prompts as the main pipeline. Does not modify the main project.
+
+### Models Tested
+
+| Model | Size | Type |
+|-------|------|------|
+| codellama:7b | 7B | Code-specialist |
+| deepseek-coder:6.7b | 6.7B | Code-specialist |
+| gemma3:12b | 12B | General purpose |
+| qwen2.5vl:7b | 7B | General purpose |
+
+All models run zero-shot with no fine-tuning. The FULL Javadoc template is used for documentation (explicit `@param`/`@return` instructions).
 
 ### Setup
 
 ```bash
-# Ollama already installed? Start it:
 ollama serve
 
-# Pull models
 ollama pull codellama:7b
 ollama pull deepseek-coder:6.7b
 ollama pull gemma3:12b
+ollama pull qwen2.5vl:7b
 ```
 
 ### Run
 
 ```bash
-# Step 1 — run main pipeline to generate prompts
+# Step 1 — run main pipeline first
 python main.py --file SimpleTest.java --mode both
 
-# Step 2 — test Ollama models on same prompts
+# Step 2 — test all Ollama models
 cd ollama_testing
 python run_ollama_test.py --pipeline_run ..\outputs\run_TIMESTAMP
 
@@ -304,7 +355,7 @@ python ollama_compare.py \
     --ollama_run   ollama_outputs
 ```
 
-### Ollama Output Structure
+### Output Structure
 
 ```
 ollama_outputs/
@@ -315,10 +366,9 @@ ollama_outputs/
 │   ├── eval_doc.json
 │   ├── result_refactor.json
 │   └── result_doc.json
-├── deepseek-coder_6_7b/
-│   └── ...
-├── gemma3_12b/
-│   └── ...
+├── deepseek-coder_6_7b/  ...
+├── gemma3_12b/           ...
+├── qwen2_5vl_7b/         ...
 └── ollama_summary_TIMESTAMP.json
 ```
 
@@ -326,37 +376,35 @@ ollama_outputs/
 
 ## Evaluation Metrics
 
-### Refactoring (main pipeline)
+### Input: SimpleTest.java — PaymentProcessor.applyDiscount
+40 LOC, 6 parameters, 8 conditionals, 3 smells (all MEDIUM)
 
-| Metric | CodeT5+ Result |
-|--------|---------------|
-| AST Valid | YES |
-| Style score | 0.833 |
-| CodeBLEU | 0.383 |
-| Semantic | 1.000 |
-| Improvement | 0.892 |
-| Confidence | 0.791 (GOOD) |
+### Refactoring
 
-### Documentation (main pipeline)
+| Metric | CodeT5+ (fine-tuned) | codellama:7b | deepseek:6.7b | gemma3:12b | qwen2.5vl:7b |
+|--------|---------------------|--------------|---------------|------------|--------------|
+| AST Valid | YES | YES | NO | NO | NO |
+| Confidence | 0.777 | 0.830 | 0.531 | 0.637 | 0.595 |
+| Logic correctness | N/A* | 1.000 | 0.800 | 1.000 | 1.000 |
+| Extract Method | N/A | YES | YES | YES | YES |
+| LOC refactored | 33 | 32 | 29 | 30 | 28 |
+| Style score | 0.833 | 1.000 | 1.000 | 1.000 | 1.000 |
 
-| Metric | CodeT5+ Result |
-|--------|---------------|
-| Coverage | 1.000 |
-| Completeness | 0.800 |
-| Has @return | NO |
-| Confidence | 0.930* |
+*CodeT5+ logic correctness is not computed by the main evaluator. Output has structural validity but logic bugs (integer discount values).
 
-*Note: 0.930 is a structural score. The model generates one sentence with no `@param` or `@return` tags.
+### Documentation
 
-### Ollama Comparison (codellama:7b, zero-shot)
+| Metric | CodeT5+ (fine-tuned) | codellama:7b | deepseek:6.7b | gemma3:12b | qwen2.5vl:7b |
+|--------|---------------------|--------------|---------------|------------|--------------|
+| Confidence | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 |
+| Completeness | 8/8 | 8/8 | 8/8 | 8/8 | 8/8 |
+| Has @param | YES | YES | YES | YES | YES |
+| Has @return | YES | YES | YES | YES | YES |
+| All params covered | NO (1/6)* | YES | YES | YES | YES |
+| Word count | 69 | 94 | 94 | 84 | 90 |
 
-| Metric | CodeT5+ | CodeLlama 7B |
-|--------|---------|--------------|
-| Refactor confidence | 0.791 | 0.830 |
-| Logic correctness | ~0.40 | 1.000 |
-| Doc confidence | 0.930* | 1.000 |
-| @param coverage | 0.000 | 1.000 |
-| Has @return | NO | YES |
+*CodeT5+ documents 1 of 6 parameters due to the 128-token output window limit.
+On the Kaggle test set (200 shorter methods): @param coverage = 0.910.
 
 ---
 
@@ -365,49 +413,40 @@ ollama_outputs/
 | Limitation | Details |
 |-----------|---------|
 | Java 8 only | `javalang` parser supports Java 8 syntax. Java 9+ uses regex fallback |
-| Model window | Effective on methods up to ~45 lines / 6 params (512-token window) |
-| Refactor logic | Model may produce structurally valid but logically incorrect code |
-| Doc quality | Fine-tuned model generates brief descriptions without `@param`/`@return` |
-| Doc training | 50k of 412k examples used due to P100 GPU time constraints |
-| Refactor training | Epoch 3 trained on Kaggle after epochs 1–2 on Colab (checkpoint transfer) |
-| Style score | 0.833 — model outputs bare methods without class wrapper (known behaviour) |
+| 512-token input window | Methods over ~45 lines / 6 params may be truncated |
+| 128-token output window | Doc agent documents 1/6 parameters on long-signature methods |
+| Refactor logic | Model produces structurally valid Java but may have logic bugs (integer discounts, variable name errors) — model capacity limitation |
+| Style score | 0.833 — model outputs bare methods without class wrapper (known CodeT5+ behaviour) |
+| DACOS Java samples | SQL files load correctly but `codesplit_java_method` folder is empty — thresholds use correct defaults |
+| Zero-shot advantage | Larger zero-shot Ollama models (7B+) outperform fine-tuned CodeT5+ (770M) on logic correctness and full @param coverage at this compute budget |
 
 ---
 
 ## Results Summary
 
-### Input: SimpleTest.java — PaymentProcessor.applyDiscount
-
-- 40 lines, 1 method, 33 LOC, 6 params, 8 conditionals
-- Smells: Long Method, Long Parameter List, Complex Conditional (all MEDIUM)
-
-### Pipeline Run
-
-```
-Refactoring:
-  Confidence  : 0.791  GOOD
-  AST Valid   : YES
-  LOC change  : 40 → 33
-  CodeBLEU    : 0.383
-
-Documentation:
-  Confidence  : 0.930  EXCELLENT (structural)
-  Coverage    : 1.000
-  Completeness: 0.800
-```
-
 ### Key Finding
 
-Zero-shot Ollama models (codellama:7b, 7B params) outperform fine-tuned CodeT5+ (770M params) on both refactoring logic correctness and documentation completeness. This highlights the trade-off between model size and fine-tuning on domain-specific data at limited compute budgets.
+Zero-shot Ollama models (codellama:7b, 7B params) outperform fine-tuned CodeT5+ (770M params) on both refactoring logic correctness and documentation completeness. CodeT5+ produces structurally valid refactored code and correct Javadoc format but is constrained by model size and token window. This demonstrates the trade-off between fine-tuning effort on a smaller model vs using a larger zero-shot model at limited compute budgets.
+
+### Comparison Graphs
+
+Run `python generate_graphs.py` to produce:
+
+| Graph | Description |
+|-------|-------------|
+| `graph1_refactor_confidence.png` | Refactoring confidence for all 5 models with AST validity |
+| `graph2_loc_reduction.png` | Lines of code before and after refactoring |
+| `graph3_doc_comparison.png` | @param/@return coverage and doc confidence |
+| `graph4_radar.png` | CodeT5+ vs CodeLlama:7b capability radar |
 
 ---
 
 ## Paper Citation
 
-If using this project for research:
-
 ```
 Autonomous Multi-Agent Platform for Java Code Smell Detection,
 Refactoring, and Documentation using Fine-tuned CodeT5+ 770M with LoRA Adapters.
-Dataset: RCCT Java (refactoring), CodeSearchNet Java (documentation), DACOS (thresholds).
+Datasets: RCCT Java (refactoring), CodeSearchNet Java (documentation), DACOS (thresholds).
+Comparative evaluation against zero-shot Ollama models: codellama:7b,
+deepseek-coder:6.7b, gemma3:12b, qwen2.5vl:7b.
 ```

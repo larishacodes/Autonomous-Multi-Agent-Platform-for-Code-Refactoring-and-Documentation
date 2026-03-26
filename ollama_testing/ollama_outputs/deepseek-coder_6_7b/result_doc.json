@@ -1,7 +1,7 @@
 {
   "model": "deepseek-coder:6.7b",
-  "duration_seconds": 14.12,
+  "duration_seconds": 13.95,
   "success": true,
   "error": null,
-  "output_cleaned": "/**\n * Calculates the discount based on various factors such as customer type, coupon code, seasonal status, quantity of items bought, and membership status.\n * @param price The original price of the item\n * @param customerType Type of the customer (premium, gold, silver)\n * @param couponCode Coupon code applied by the customer\n * @param isSeasonal Whether the product being purchased is in season or not\n * @param quantity Quantity of items bought\n * @param isMember Whether the customer is a member or not\n * @return The price after applying discount\n */"
+  "output_cleaned": "/**\n * Calculates the discount based on various factors such as customer type, coupon code, seasonal status, quantity of items bought, and membership status.\n * @param price The original price of the item.\n * @param customerType Type of the customer (premium, gold, silver).\n * @param couponCode Coupon code applied by the customer.\n * @param isSeasonal Whether the product being purchased is in season or not.\n * @param quantity Quantity of items bought by the customer.\n * @param isMember Whether the customer is a member or not.\n * @return The price after applying discount.\n */"
 }

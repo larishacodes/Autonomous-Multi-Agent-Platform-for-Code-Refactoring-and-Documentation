@@ -1,6 +1,6 @@
 {
   "model": "gemma3:12b",
-  "duration_seconds": 23.94,
+  "duration_seconds": 22.67,
   "success": true,
   "error": null,
   "output_cleaned": "/**\n * Applies a discount to the given price based on various factors.\n * @param price The original price of the item.\n * @param customerType The type of customer (e.g., \"premium\", \"gold\", \"silver\").\n * @param couponCode The coupon code applied to the purchase.\n * @param isSeasonal A boolean indicating whether the purchase is during a seasonal promotion.\n * @param quantity The quantity of items being purchased.\n * @param isMember A boolean indicating whether the customer is a member.\n * @return The discounted price.\n */"
