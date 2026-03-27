@@ -1,8 +1,8 @@
 {
   "ast_validity": {
-    "valid": false,
+    "valid": true,
     "method": "javalang",
-    "error": ""
+    "error": null
   },
   "style_metrics": {
     "score": 1.0,
@@ -31,16 +31,16 @@
   },
   "improvement": {
     "loc_original": 40,
-    "loc_refactored": 32,
-    "loc_delta": 8,
-    "score": 0.2
+    "loc_refactored": 29,
+    "loc_delta": 11,
+    "score": 0.275
   },
   "extract_method": {
     "extracted_methods": 1,
     "applied": true
   },
   "confidence": {
-    "score": 0.58,
-    "status": "FAIR"
+    "score": 0.841,
+    "status": "EXCELLENT"
   }
 }
