@@ -1,0 +1,24 @@
+{
+  "parse_success": true,
+  "parser_used": "javalang",
+  "language": "java",
+  "total_loc": 1,
+  "file_path": "",
+  "classes": [
+    {
+      "name": "Test",
+      "docstring": null,
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "method_count": 0,
+      "loc": 1,
+      "lcom": 0.0,
+      "instability": 0.0,
+      "methods": [],
+      "parser_used": "javalang"
+    }
+  ],
+  "functions": []
+}

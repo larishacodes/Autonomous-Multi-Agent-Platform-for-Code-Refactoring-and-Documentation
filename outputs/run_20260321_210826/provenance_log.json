@@ -1,0 +1,68 @@
+[
+  {
+    "version": 1,
+    "agent": "pipeline",
+    "action": "smells_attached",
+    "summary": "2 smell(s) from SmellDetector"
+  },
+  {
+    "version": 2,
+    "agent": "planner",
+    "action": "plan_from_smells",
+    "summary": "Generated 4 task(s) from 2 smell(s)"
+  },
+  {
+    "version": 3,
+    "agent": "supervisor",
+    "action": "task_started:refactor-processorder-0",
+    "summary": "[in_progress] refactor-processorder-0 \u2014 attempt 1"
+  },
+  {
+    "version": 4,
+    "agent": "supervisor",
+    "action": "task_done",
+    "summary": "refactor-processorder-0 DONE (confidence=1.00)"
+  },
+  {
+    "version": 5,
+    "agent": "supervisor",
+    "action": "task_started:doc-processorder-0",
+    "summary": "[in_progress] doc-processorder-0 \u2014 attempt 1"
+  },
+  {
+    "version": 6,
+    "agent": "supervisor",
+    "action": "task_done",
+    "summary": "doc-processorder-0 DONE (confidence=1.00)"
+  },
+  {
+    "version": 7,
+    "agent": "supervisor",
+    "action": "task_started:refactor-processorder-1",
+    "summary": "[in_progress] refactor-processorder-1 \u2014 attempt 1"
+  },
+  {
+    "version": 8,
+    "agent": "supervisor",
+    "action": "task_done",
+    "summary": "refactor-processorder-1 DONE (confidence=1.00)"
+  },
+  {
+    "version": 9,
+    "agent": "supervisor",
+    "action": "task_started:doc-processorder-1",
+    "summary": "[in_progress] doc-processorder-1 \u2014 attempt 1"
+  },
+  {
+    "version": 10,
+    "agent": "supervisor",
+    "action": "task_done",
+    "summary": "doc-processorder-1 DONE (confidence=1.00)"
+  },
+  {
+    "version": 11,
+    "agent": "evaluator",
+    "action": "evaluation_complete",
+    "summary": "refactor_conf=0.789 doc_conf=0.930"
+  }
+]

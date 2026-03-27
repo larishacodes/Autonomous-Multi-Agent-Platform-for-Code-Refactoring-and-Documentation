@@ -1,0 +1,12 @@
+============================================================
+CODE SMELL ANALYSIS REPORT — Java
+============================================================
+Methods analysed : 0
+Classes analysed : 1
+Total LOC        : 1
+Smells detected  : 0
+Parser used      : javalang
+Thresholds from  : DACOS dataset
+
+No significant code smells detected.
+============================================================

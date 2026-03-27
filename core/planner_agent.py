@@ -232,7 +232,6 @@ class PlannerAgent:
     def run(
         self,
         repo_state: RepoState,
-        smells: list[CodeSmell],
         *,
         replan: bool = False,
     ) -> RepoState:
@@ -253,6 +252,8 @@ class PlannerAgent:
         """
 
         # ── 1. Retrieval ──────────────────────────────────────────────────
+        print("🔥 PLANNER RUN VERSION 2")
+        smells = repo_state.smells
         retrieved_symbols = self._retrieve(repo_state, smells)
 
         # ── 2. Task generation ────────────────────────────────────────────

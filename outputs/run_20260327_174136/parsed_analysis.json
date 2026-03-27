@@ -1,0 +1,98 @@
+{
+  "parse_success": true,
+  "parser_used": "javalang",
+  "language": "java",
+  "total_loc": 43,
+  "file_path": "",
+  "classes": [
+    {
+      "name": "BadCode",
+      "docstring": null,
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "method_count": 1,
+      "loc": 41,
+      "lcom": 0.0,
+      "instability": 0.0,
+      "methods": [
+        {
+          "name": "main",
+          "params": [
+            "args"
+          ],
+          "docstring": null,
+          "file_path": "",
+          "start_line": 5,
+          "end_line": 41,
+          "calls": [
+            "main",
+            "println",
+            "add",
+            "valueOf",
+            "processData",
+            "calculate",
+            "isEmpty"
+          ],
+          "called_by": [
+            "main"
+          ],
+          "complexity": 5,
+          "loc": 37,
+          "cohesion_score": 1.0,
+          "param_count": 1,
+          "return_type": "void",
+          "modifiers": [
+            "public",
+            "static"
+          ],
+          "nesting_depth": 2,
+          "conditional_count": 2,
+          "loop_count": 2,
+          "responsibility_count": 3,
+          "parser_used": "javalang"
+        }
+      ],
+      "parser_used": "javalang"
+    }
+  ],
+  "functions": [
+    {
+      "name": "main",
+      "params": [
+        "args"
+      ],
+      "docstring": null,
+      "file_path": "",
+      "start_line": 5,
+      "end_line": 41,
+      "calls": [
+        "main",
+        "println",
+        "add",
+        "valueOf",
+        "processData",
+        "calculate",
+        "isEmpty"
+      ],
+      "called_by": [
+        "main"
+      ],
+      "complexity": 5,
+      "loc": 37,
+      "cohesion_score": 1.0,
+      "param_count": 1,
+      "return_type": "void",
+      "modifiers": [
+        "public",
+        "static"
+      ],
+      "nesting_depth": 2,
+      "conditional_count": 2,
+      "loop_count": 2,
+      "responsibility_count": 3,
+      "parser_used": "javalang"
+    }
+  ]
+}

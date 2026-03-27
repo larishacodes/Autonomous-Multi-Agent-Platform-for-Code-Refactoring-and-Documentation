@@ -1,0 +1,66 @@
+{
+  "ast_validity": {
+    "valid": true,
+    "method": "javalang",
+    "error": null
+  },
+  "style_metrics": {
+    "score": 1.0,
+    "checks": {
+      "camel_case_methods": true,
+      "pascal_case_classes": true,
+      "brace_same_line": true,
+      "spaces_not_tabs": true,
+      "has_semicolons": true,
+      "minimal_trailing_ws": true
+    },
+    "passed": 6,
+    "total": 6
+  },
+  "codebleu_score": 1.0,
+  "semantic_preservation": {
+    "score": 0.7,
+    "preservation_rate": 1.0,
+    "token_similarity": 1.0,
+    "ideal_similarity": false,
+    "length_ratio": 1.005,
+    "length_ok": true,
+    "original_methods": [
+      "fulfillOrder",
+      "chargeCustomer",
+      "processOrder",
+      "validateCustomer"
+    ],
+    "preserved_methods": [
+      "fulfillOrder",
+      "chargeCustomer",
+      "processOrder",
+      "validateCustomer"
+    ]
+  },
+  "improvement": {
+    "score": 0.47,
+    "loc_original": 61,
+    "loc_refactored": 61,
+    "loc_delta": 0,
+    "depth_original": 5,
+    "depth_refactored": 5,
+    "changed_lines": 3
+  },
+  "confidence": {
+    "score": 0.789,
+    "status": "\u2705 GOOD",
+    "components": {
+      "style": 1.0,
+      "codebleu": 1.0,
+      "semantic": 0.7,
+      "improvement": 0.47
+    },
+    "weights": {
+      "style": 0.2,
+      "codebleu": 0.25,
+      "semantic": 0.35,
+      "improvement": 0.2
+    }
+  }
+}

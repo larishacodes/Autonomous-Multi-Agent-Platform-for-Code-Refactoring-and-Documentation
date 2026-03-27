@@ -1,0 +1,64 @@
+============================================================
+JAVA DOCUMENTATION QUALITY EVALUATION REPORT
+============================================================
+Generated: 2026-03-21 21:22:05
+
+METHOD COVERAGE
+----------------------------------------
+Score  : 1.0/1.0
+Covered: 4/4 methods
+
+COMPLETENESS
+----------------------------------------
+Score : 0.8/1.0  (4/5 checks passed)
+  ✅ Has Overview
+  ✅ Has Parameters
+  ❌ Has Return Info
+  ✅ Has Method Docs
+  ✅ Has Javadoc Style
+
+LENGTH & READABILITY
+----------------------------------------
+Score      : 1.0/1.0
+Word count : 153  (expected 80–400)
+Line count : 57
+
+OVERALL CONFIDENCE
+----------------------------------------
+Score  : 0.93/1.0
+Status : ✅ EXCELLENT
+
+Component Scores:
+  Coverage        ████████████████████  1.000  (35%)
+  Completeness    ████████████████░░░░  0.800  (35%)
+  Length          ████████████████████  1.000  (30%)
+
+============================================================
+VERDICT
+============================================================
+✅ Documentation ACCEPTED — Good to excellent quality.
+
+============================================================
+DOCUMENTATION PREVIEW (first 20 lines)
+============================================================
+   1: # Code Documentation
+   2: 
+   3: ## Overview
+   4: 
+   5: This module contains 4 function(s) and 1 class(es).
+   6: 
+   7: ---
+   8: 
+   9: ## Functions
+  10: 
+  11: ### `processOrder`
+  12: 
+  13: **Description:** <p>processOrder.</p>
+  14: 
+  15: @param processOrder a {@link java.lang.Object} object.
+  16: @see com.greenpepper.server.domain.ProcessOrder#processOrder()
+  17: 
+  18: | Metric | Value |
+  19: |--------|-------|
+  20: | Line number | ? |
+  ... (57 lines total)

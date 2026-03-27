@@ -1,0 +1,41 @@
+{
+  "raw_code": "public class Test {}",
+  "classes": [
+    {
+      "name": "Test",
+      "methods": [],
+      "docstring": null,
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "lcom": 0.0,
+      "instability": 0.0
+    }
+  ],
+  "functions": [],
+  "imports": [],
+  "metadata": {
+    "parser_used": "javalang",
+    "total_loc": 1,
+    "mode": "both",
+    "repo_hash": "aa6fe681bb73f76a454a59d9c1f28c5942115a2c70f4052a6ad0635b7da12879"
+  },
+  "smells": [],
+  "tasks": [],
+  "refactor_results": [],
+  "documentation_results": [],
+  "evaluation_scores": {},
+  "completed_tasks": [],
+  "provenance_log": [
+    {
+      "version": 1,
+      "agent_id": "pipeline",
+      "action": "smells_attached",
+      "summary": "0 smell(s) from SmellDetector"
+    }
+  ],
+  "version": 1,
+  "structural_hash": "3e68302928955876293f8ee212e57ba05286117f0c95eb78f326c5b78dc821a5",
+  "execution_hash": "c2e5e27aa3ff55bb74275be0014d72caa0594e23f9c57ad8659183d8480a4e64"
+}

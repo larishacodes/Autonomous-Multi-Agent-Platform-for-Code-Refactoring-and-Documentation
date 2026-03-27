@@ -1,4 +1,9 @@
 import os as _os
+from unittest import result
+
+from conftest import repo_state
+
+
 # Prevent transformers from contacting HuggingFace Hub during model load
 _os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
 _os.environ.setdefault('HF_HUB_OFFLINE', '1')
@@ -73,30 +78,83 @@ sys.path.insert(0, str(ROOT))
 # ───────────────────────────────────────────────────────────────────────────
 
 def parse_args():
+    """
+    Parse command-line arguments for the Autonomous Multi-Agent Platform.
+
+    This CLI allows you to:
+    - Run the pipeline on a Java file
+    - Choose execution mode (refactor / document / both)
+    - Enable dry-run mode (no LLM calls)
+    - Query the processed code using RAG
+
+    Returns:
+        argparse.Namespace: Parsed arguments
+    """
+
     parser = argparse.ArgumentParser(
-        description="Autonomous Multi-Agent Platform — Java"
+        description="""
+Autonomous Multi-Agent Platform for Code Refactoring and Documentation.
+
+Pipeline Flow:
+  1. Parse Java code
+  2. Detect code smells
+  3. Generate refactoring + documentation prompts
+  4. (Optional) Execute agents
+  5. Evaluate outputs
+  6. Enable RAG-based querying
+
+Examples:
+  python main.py --file SimpleTest.java --mode both
+  python main.py --file OrderProcessor.java --mode refactor
+  python main.py --file SimpleTest.java --mode both --dry-run
+  python main.py --file SimpleTest.java --ask "What does this class do?"
+"""
     )
 
-    parser.add_argument("--file", "-f", default="SimpleTest.java",
-                        help="Java file to process")
+    # ── Core execution ─────────────────────────────────────────────
+    parser.add_argument(
+        "--file", "-f",
+        default="SimpleTest.java",
+        help="Path to the Java file to process (default: SimpleTest.java)"
+    )
 
-    parser.add_argument("--mode", "-m",
-                        choices=["refactor", "document", "both"],
-                        default="both",
-                        help="Pipeline mode")
+    parser.add_argument(
+        "--mode", "-m",
+        choices=["refactor", "document", "both"],
+        default="both",
+        help="Execution mode: refactor code, generate documentation, or both"
+    )
 
-    # RAG options
-    parser.add_argument("--ask", type=str, default=None,
-                        help="Ask a single question after pipeline")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Disable all LLM/model calls (runs full pipeline with mock outputs)"
+    )
 
-    parser.add_argument("--query", action="store_true",
-                        help="Enter interactive query mode")
+    # ── RAG / Query features ───────────────────────────────────────
+    parser.add_argument(
+        "--ask",
+        type=str,
+        default=None,
+        help="Ask a single question about the processed code (RAG)"
+    )
 
-    parser.add_argument("--query-mode",
-                        choices=["answer", "explain", "smell"],
-                        default="answer")
+    parser.add_argument(
+        "--query",
+        action="store_true",
+        help="Enter interactive query mode after pipeline execution"
+    )
+
+    parser.add_argument(
+        "--query-mode",
+        choices=["answer", "explain", "smell"],
+        default="answer",
+        help="Query mode: answer (default), explain code, or analyze smells"
+    )
 
     return parser.parse_args()
+
+
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -176,10 +234,25 @@ def main():
     try:
         from pipeline import Pipeline
         pipeline = Pipeline()
-        result = pipeline.run(source_code, mode=args.mode)
+        
+        result = pipeline.run(source_code, mode=args.mode, disable_llm=args.dry_run)
+        repo_state = getattr(pipeline, "_last_repo_state", None)
+        
     except Exception as e:
         print(f"\n❌ Pipeline failed: {e}")
         return 1
+    
+    print("\n--- DEBUG: REPOSTATE ---")
+    print(type(repo_state))
+
+    if repo_state:
+        print(f"RepoState Version: {repo_state.version}")
+        print(f"Functions: {len(repo_state.functions)}")
+        print(f"Smells: {len(repo_state.smells)}")
+    else:
+        print("RepoState NOT FOUND")
+
+
 
     if not result.get("success"):
         print("\n❌ Pipeline completed with errors")

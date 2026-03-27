@@ -1,0 +1,98 @@
+{
+  "parse_success": true,
+  "parser_used": "javalang",
+  "language": "java",
+  "total_loc": 40,
+  "file_path": "",
+  "classes": [
+    {
+      "name": "PaymentProcessor",
+      "docstring": null,
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "method_count": 1,
+      "loc": 40,
+      "lcom": 0.0,
+      "instability": 0.0,
+      "methods": [
+        {
+          "name": "applyDiscount",
+          "params": [
+            "price",
+            "customerType",
+            "couponCode",
+            "isSeasonal",
+            "quantity",
+            "isMember"
+          ],
+          "docstring": "SMELL: Long Parameter List (6 params) + Complex Conditional Simpler than calculateDiscount \u2014 model can handle this size.",
+          "file_path": "",
+          "start_line": 7,
+          "end_line": 39,
+          "calls": [
+            "applyDiscount",
+            "equals",
+            "min"
+          ],
+          "called_by": [
+            "applyDiscount"
+          ],
+          "complexity": 9,
+          "loc": 33,
+          "cohesion_score": 1.0,
+          "param_count": 6,
+          "return_type": "double",
+          "modifiers": [
+            "public"
+          ],
+          "nesting_depth": 2,
+          "conditional_count": 8,
+          "loop_count": 0,
+          "responsibility_count": 1,
+          "parser_used": "javalang"
+        }
+      ],
+      "parser_used": "javalang"
+    }
+  ],
+  "functions": [
+    {
+      "name": "applyDiscount",
+      "params": [
+        "price",
+        "customerType",
+        "couponCode",
+        "isSeasonal",
+        "quantity",
+        "isMember"
+      ],
+      "docstring": "SMELL: Long Parameter List (6 params) + Complex Conditional Simpler than calculateDiscount \u2014 model can handle this size.",
+      "file_path": "",
+      "start_line": 7,
+      "end_line": 39,
+      "calls": [
+        "applyDiscount",
+        "equals",
+        "min"
+      ],
+      "called_by": [
+        "applyDiscount"
+      ],
+      "complexity": 9,
+      "loc": 33,
+      "cohesion_score": 1.0,
+      "param_count": 6,
+      "return_type": "double",
+      "modifiers": [
+        "public"
+      ],
+      "nesting_depth": 2,
+      "conditional_count": 8,
+      "loop_count": 0,
+      "responsibility_count": 1,
+      "parser_used": "javalang"
+    }
+  ]
+}

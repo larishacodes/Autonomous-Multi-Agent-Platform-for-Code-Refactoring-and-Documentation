@@ -1,0 +1,96 @@
+{
+  "raw_code": "public class PaymentProcessor {\n\n    /**\n     * SMELL: Long Parameter List (6 params) + Complex Conditional\n     * Simpler than calculateDiscount \u2014 model can handle this size.\n     */\n    public double applyDiscount(double price, String customerType,\n                                String couponCode, boolean isSeasonal,\n                                int quantity, boolean isMember) {\n        double discount = 0;\n\n        if (customerType.equals(\"premium\")) {\n            discount += 0.20;\n        } else if (customerType.equals(\"gold\")) {\n            discount += 0.15;\n        } else if (customerType.equals(\"silver\")) {\n            discount += 0.10;\n        }\n\n        if (couponCode.equals(\"SAVE10\")) {\n            discount += 0.10;\n        } else if (couponCode.equals(\"SAVE5\")) {\n            discount += 0.05;\n        }\n\n        if (isSeasonal) {\n            discount += 0.15;\n        }\n\n        if (quantity > 10) {\n            discount += 0.10;\n        }\n\n        if (isMember) {\n            discount += 0.05;\n        }\n\n        return price * (1 - Math.min(discount, 0.50));\n    }\n}\n",
+  "classes": [
+    {
+      "name": "PaymentProcessor",
+      "methods": [],
+      "docstring": null,
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "lcom": 0.0,
+      "instability": 0.0
+    }
+  ],
+  "functions": [
+    {
+      "name": "applyDiscount",
+      "params": [
+        "price",
+        "customerType",
+        "couponCode",
+        "isSeasonal",
+        "quantity",
+        "isMember"
+      ],
+      "docstring": "SMELL: Long Parameter List (6 params) + Complex Conditional Simpler than calculateDiscount \u2014 model can handle this size.",
+      "file_path": "",
+      "start_line": 7,
+      "end_line": 39,
+      "calls": [
+        "applyDiscount",
+        "equals",
+        "min"
+      ],
+      "called_by": [
+        "applyDiscount"
+      ],
+      "complexity": 9,
+      "loc": 33,
+      "cohesion_score": 1.0
+    }
+  ],
+  "imports": [],
+  "metadata": {
+    "parser_used": "javalang",
+    "total_loc": 40,
+    "mode": "both",
+    "repo_hash": "7cf13e3531219429e8665512ca49f454009e365d90c549ae56e95c091709c578"
+  },
+  "smells": [
+    {
+      "smell_type": "Long Method",
+      "location": "applyDiscount",
+      "description": "loc=33 (threshold=30)",
+      "severity": 2,
+      "agent_id": "smell_detector",
+      "confidence": 1.0,
+      "reasoning": "Method 'applyDiscount' has 33 lines (threshold: 30)"
+    },
+    {
+      "smell_type": "Long Parameter List",
+      "location": "applyDiscount",
+      "description": "param_count=6 (threshold=5)",
+      "severity": 2,
+      "agent_id": "smell_detector",
+      "confidence": 1.0,
+      "reasoning": "Method 'applyDiscount' has 6 parameters (threshold: 5)"
+    },
+    {
+      "smell_type": "Complex Conditional",
+      "location": "applyDiscount",
+      "description": "conditional_count=8 (threshold=5)",
+      "severity": 2,
+      "agent_id": "smell_detector",
+      "confidence": 1.0,
+      "reasoning": "Method 'applyDiscount' has 8 conditional branches (threshold: 5)"
+    }
+  ],
+  "tasks": [],
+  "refactor_results": [],
+  "documentation_results": [],
+  "evaluation_scores": {},
+  "completed_tasks": [],
+  "provenance_log": [
+    {
+      "version": 1,
+      "agent_id": "pipeline",
+      "action": "smells_attached",
+      "summary": "3 smell(s) from SmellDetector"
+    }
+  ],
+  "version": 1,
+  "structural_hash": "a1d33a391a1ee0038948a0381a0bf527dcc187b801b18d5742f11e44a5ddf6c7",
+  "execution_hash": "0759938151e8d11bf3b0c19cd5fdd0c09c7763713060f57029fd6320e9ee8cb0"
+}

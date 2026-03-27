@@ -1,0 +1,86 @@
+{
+  "raw_code": "import java.util.*;\r\n\r\npublic class BadCode {\r\n\r\n    public static void main(String[] args) {\r\n        int x = 10;\r\n        int y = 20;\r\n        int z = 0;\r\n\r\n        for (int i = 0; i < 5; i++) {\r\n            z += i * 2 + 3;\r\n        }\r\n\r\n        System.out.println(\"Result: \" + z);\r\n\r\n        if (x > 5 && y > 10 && z > 15) {\r\n            System.out.println(\"All conditions met\");\r\n        }\r\n\r\n        List<Object> list = new ArrayList<>();\r\n        list.add(\"A\");\r\n        list.add(\"B\");\r\n        list.add(Integer.valueOf(100));\r\n\r\n        for (Object item : list) {\r\n            System.out.println(item);\r\n        }\r\n\r\n        processData(list);\r\n        processData(list);\r\n\r\n        calculate(5, 10);\r\n        calculate(5, 10);\r\n\r\n        String s = \"\";\r\n        if (!s.isEmpty()) {\r\n            System.out.println(s);\r\n        }\r\n\r\n        System.out.println(\"Done\");\r\n    }\r\n\r\n}",
+  "classes": [
+    {
+      "name": "BadCode",
+      "methods": [],
+      "docstring": null,
+      "file_path": "",
+      "superclass": null,
+      "interfaces": [],
+      "is_abstract": false,
+      "lcom": 0.0,
+      "instability": 0.0
+    }
+  ],
+  "functions": [
+    {
+      "name": "main",
+      "params": [
+        "args"
+      ],
+      "docstring": null,
+      "file_path": "",
+      "start_line": 5,
+      "end_line": 41,
+      "calls": [
+        "main",
+        "println",
+        "add",
+        "valueOf",
+        "processData",
+        "calculate",
+        "isEmpty"
+      ],
+      "called_by": [
+        "main"
+      ],
+      "complexity": 5,
+      "loc": 37,
+      "cohesion_score": 1.0
+    }
+  ],
+  "imports": [],
+  "metadata": {
+    "parser_used": "javalang",
+    "total_loc": 43,
+    "mode": "refactor",
+    "repo_hash": "5f53776baa0e7bc138e362b2e76ee95bc84fdec256c177d6580302dcc91927fe"
+  },
+  "smells": [
+    {
+      "smell_type": "Multifaceted Abstraction",
+      "location": "main",
+      "description": "responsibility_count=3 (threshold=2)",
+      "severity": 3,
+      "agent_id": "smell_detector",
+      "confidence": 1.0,
+      "reasoning": "Method 'main' has 3 distinct responsibilities (threshold: 2)"
+    },
+    {
+      "smell_type": "Long Method",
+      "location": "main",
+      "description": "loc=37 (threshold=30)",
+      "severity": 2,
+      "agent_id": "smell_detector",
+      "confidence": 1.0,
+      "reasoning": "Method 'main' has 37 lines (threshold: 30)"
+    }
+  ],
+  "tasks": [],
+  "refactor_results": [],
+  "documentation_results": [],
+  "evaluation_scores": {},
+  "completed_tasks": [],
+  "provenance_log": [
+    {
+      "version": 1,
+      "agent_id": "pipeline",
+      "action": "smells_attached",
+      "summary": "2 smell(s) from SmellDetector"
+    }
+  ],
+  "version": 1,
+  "structural_hash": "6f9ccca46d80838e670f8611a33217181abab123859e30b1bb0ca86c4225cb27",
+  "execution_hash": "a677ee1a7638fc33f5667b349d2cf384182f3438df3694914e202e4cca7374b1"
+}

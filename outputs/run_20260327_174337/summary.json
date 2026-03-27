@@ -1,0 +1,80 @@
+{
+  "timestamp": "20260327_174337",
+  "mode": "refactor",
+  "agent_flags_active": {
+    "use_repo_state": true,
+    "use_symbol_index": true,
+    "use_planner": true,
+    "use_supervisor": true,
+    "use_evaluator": true
+  },
+  "input": {
+    "parser": "javalang",
+    "loc": 43,
+    "methods": 1,
+    "classes": 1,
+    "smells": [
+      {
+        "name": "Multifaceted Abstraction",
+        "severity": "high",
+        "function": "main"
+      },
+      {
+        "name": "Long Method",
+        "severity": "medium",
+        "function": "main"
+      }
+    ]
+  },
+  "refactor": {
+    "confidence_score": 0.785,
+    "confidence_status": "\u2705 GOOD",
+    "ast_valid": true,
+    "style_score": 1.0,
+    "codebleu": 1.0,
+    "semantic_score": 0.7,
+    "improvement_score": 0.45,
+    "loc_original": 43,
+    "loc_refactored": 43
+  },
+  "doc": {
+    "confidence_score": 0.912,
+    "confidence_status": "\u2705 EXCELLENT",
+    "coverage_score": 1.0,
+    "completeness_score": 0.75
+  },
+  "evaluation_scores": {
+    "refactor/confidence": 0.785,
+    "refactor/ast_valid": 1.0,
+    "refactor/style": 1.0,
+    "refactor/codebleu": 1.0,
+    "refactor/semantic": 0.7,
+    "refactor/improvement": 0.45,
+    "refactor/loc_original": 43,
+    "refactor/loc_refactored": 43,
+    "doc/confidence": 0.912,
+    "doc/coverage": 1.0,
+    "doc/completeness": 0.75
+  },
+  "tasks_completed": 4,
+  "tasks_total": 4,
+  "state_version": 11,
+  "files": [
+    "EVALUATION_doc_doc-main-0.json",
+    "EVALUATION_doc_doc-main-0.txt",
+    "EVALUATION_doc_doc-main-1.json",
+    "EVALUATION_doc_doc-main-1.txt",
+    "EVALUATION_refactor_refactor-main-0.json",
+    "EVALUATION_refactor_refactor-main-0.txt",
+    "EVALUATION_refactor_refactor-main-1.json",
+    "EVALUATION_refactor_refactor-main-1.txt",
+    "PROMPT_doc_agent.txt",
+    "PROMPT_refactor_agent.txt",
+    "documentation.md",
+    "parsed_analysis.json",
+    "refactored_code.java",
+    "refactoring_plan.txt",
+    "repo_state_debug.json",
+    "smell_report.txt"
+  ]
+}

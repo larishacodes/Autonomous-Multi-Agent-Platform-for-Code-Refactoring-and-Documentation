@@ -1,0 +1,6 @@
+Generate Javadoc for the following Java code.
+Methods: none
+
+public class Test {}
+
+Return ONLY the Javadoc:

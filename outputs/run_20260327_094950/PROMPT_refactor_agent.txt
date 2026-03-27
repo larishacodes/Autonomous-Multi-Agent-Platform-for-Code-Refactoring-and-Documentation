@@ -1,0 +1,5 @@
+Refactor the following Java code to improve quality.
+
+public class Test {}
+
+Return ONLY the refactored Java code:
